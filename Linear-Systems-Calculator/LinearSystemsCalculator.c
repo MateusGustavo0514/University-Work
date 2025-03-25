@@ -1,57 +1,109 @@
 #include <stdio.h>
 
-int main() {
-    int op, linhas, colunas;
+void EscalonamentoMatrizes(int linhas, int colunas, float matriz[linhas][colunas]) {
 
-    do {
-        printf("<<< Calculadora de Sistemas de Equacao >>>\n");
-
-        printf("Numero de Linhas: ");
-        scanf("%d", &linhas);
-
-        printf("Numero de Colunas: ");
-        scanf("%d", &colunas);
-
-        printf("Essa e a dimensao da matriz [%d][%d]?\n 1. Sim\n 2. Nao\n Insira Aqui: ", linhas, colunas);
-        scanf("%d", &op);
-
-        if (op == 1) {
-            int matriz[linhas][colunas]; 
-            LeituraImpressaoMatrizes(linhas, colunas, matriz);
-
-            printf("\n\nEscalonando...\n\n");
-            EscalonamentoMatrizes();
-            
-        } else {
-            printf("\n----- Insira novamente -----\n\n");
+    for (int k = 0; k < linhas; k++) {
+        if (matriz[k][k] == 0) {
+            int trocou = 0;
+            for (int i = k + 1; i < linhas; i++) {
+                if (matriz[i][k] != 0) { 
+                    for (int j = 0; j < colunas; j++) {
+                        float temp = matriz[k][j];
+                        matriz[k][j] = matriz[i][j];
+                        matriz[i][j] = temp;
+                    }
+                    trocou = 1;
+                    break;
+                }
+            }
+            if (!trocou) continue; 
         }
 
-    } while (op != 1);
-
-    return 0;
-}
-
-void LeituraImpressaoMatrizes(int linhas, int colunas, int matriz[linhas][colunas]) {
-    printf("Digite os elementos da matriz:\n");
-
-    for (int i = 0; i < linhas; i++) {
+        float pivo = matriz[k][k];
         for (int j = 0; j < colunas; j++) {
-            printf("Elemento [%d][%d]: ", i + 1, j + 1);
-            scanf("%d", &matriz[i][j]);
+            matriz[k][j] /= pivo;
+        }
+
+        for (int i = k + 1; i < linhas; i++) {
+            float fator = matriz[i][k];  
+            for (int j = 0; j < colunas; j++) {
+                matriz[i][j] -= fator * matriz[k][j];
+            }
         }
     }
 
 
-    printf("\nMatriz inserida:\n");
+    printf("\nMatriz escalonada:\n");
     for (int i = 0; i < linhas; i++) {
         for (int j = 0; j < colunas; j++) {
-            printf("%d ", matriz[i][j]);
+            printf("%.2f ", matriz[i][j]);
         }
         printf("\n");
     }
+
+   
+    int sistemaImpossivel = 0, sistemaIndeterminado = 0;
+
+    for (int i = 0; i < linhas; i++) {
+        int todosZeros = 1;
+        for (int j = 0; j < colunas - 1; j++) {
+            if (matriz[i][j] != 0) {
+                todosZeros = 0;
+                break;
+            }
+        }
+        if (todosZeros && matriz[i][colunas - 1] != 0) {
+            sistemaImpossivel = 1; // SI: 0x + 0y + 0z = b (b ≠ 0)
+            break;
+        } else if (todosZeros && matriz[i][colunas - 1] == 0) {
+            sistemaIndeterminado = 1; // SPI: 0x + 0y + 0z = 0
+        }
+    }
+
+    if (sistemaImpossivel) {
+        printf("\nO sistema é impossível (SI), pois há uma linha da forma 0x + 0y + 0z = b (b ≠ 0).\n");
+        return;
+    } else if (sistemaIndeterminado) {
+        printf("\nO sistema possui infinitas soluções (SPI), pois há pelo menos uma linha nula.\n");
+        return;
+    }
+
+    float solucoes[linhas];
+    for (int i = linhas - 1; i >= 0; i--) {
+        solucoes[i] = matriz[i][colunas - 1]; // Começa com o termo independente
+        for (int j = i + 1; j < colunas - 1; j++) {
+            solucoes[i] -= matriz[i][j] * solucoes[j]; // Subtrai os valores já resolvidos
+        }
+    }
+
+    printf("\n\nSoluções do sistema:\n");
+    for (int i = 0; i < linhas; i++) {
+        printf("x%d = %.2f\n", i + 1, solucoes[i]);
+    }
 }
 
+int main() {
+    int linhas, colunas;
 
-void EscalonamentoMatrizes(int linhas, int colunas, int matriz[linhas][colunas]) {
-    printf("Função de escalonamento ainda não implementada.\n");
+    printf("<<< Calculadora de Sistemas de Equacao >>>\n");
+
+    printf("Numero de Linhas: ");
+    scanf("%d", &linhas);
+
+    printf("Numero de Colunas (coeficientes + termos independentes): ");
+    scanf("%d", &colunas);
+
+    float matriz[linhas][colunas];
+
+    printf("\nDigite os elementos da matriz:\n");
+    for (int i = 0; i < linhas; i++) {
+        for (int j = 0; j < colunas; j++) {
+            printf("Elemento [%d][%d]: ", i + 1, j + 1);
+            scanf("%f", &matriz[i][j]);
+        }
+    }
+
+    EscalonamentoMatrizes(linhas, colunas, matriz);
+
+    return 0;
 }
