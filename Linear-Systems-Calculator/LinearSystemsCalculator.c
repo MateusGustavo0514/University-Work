@@ -36,7 +36,7 @@ void EscalonamentoMatrizes(int linhas, int colunas, float matriz[linhas][colunas
     printf("\nMatriz escalonada:\n");
     for (int i = 0; i < linhas; i++) {
         for (int j = 0; j < colunas; j++) {
-            printf("%.2f ", matriz[i][j]);
+            printf("%.2f\t ", matriz[i][j]);
         }
         printf("\n");
     }
@@ -61,22 +61,22 @@ void EscalonamentoMatrizes(int linhas, int colunas, float matriz[linhas][colunas
     }
 
     if (sistemaImpossivel) {
-        printf("\nO sistema é impossível (SI), pois há uma linha da forma 0x + 0y + 0z = b (b ≠ 0).\n");
+        printf("\nO sistema é impossivel (SI), pois ha uma linha da forma 0x + 0y + 0z = b (b ≠ 0).\n");
         return;
     } else if (sistemaIndeterminado) {
-        printf("\nO sistema possui infinitas soluções (SPI), pois há pelo menos uma linha nula.\n");
+        printf("\nO sistema possui infinitas solucoes (SPI), pois ha pelo menos uma linha nula.\n");
         return;
     }
 
     float solucoes[linhas];
     for (int i = linhas - 1; i >= 0; i--) {
-        solucoes[i] = matriz[i][colunas - 1]; // Começa com o termo independente
+        solucoes[i] = matriz[i][colunas - 1];
         for (int j = i + 1; j < colunas - 1; j++) {
-            solucoes[i] -= matriz[i][j] * solucoes[j]; // Subtrai os valores já resolvidos
+            solucoes[i] -= matriz[i][j] * solucoes[j]; 
         }
     }
 
-    printf("\n\nSoluções do sistema:\n");
+    printf("\n\nSolucoes do sistema:\n");
     for (int i = 0; i < linhas; i++) {
         printf("x%d = %.2f\n", i + 1, solucoes[i]);
     }
@@ -101,6 +101,14 @@ int main() {
             printf("Elemento [%d][%d]: ", i + 1, j + 1);
             scanf("%f", &matriz[i][j]);
         }
+    }
+
+    printf("\nA matriz nao escalonada:\n");
+    for (int i = 0; i < linhas; i++) {
+        for (int j = 0; j < colunas; j++) {
+            printf("%.2f\t", matriz[i][j]);
+        }
+        printf("\n");
     }
 
     EscalonamentoMatrizes(linhas, colunas, matriz);
